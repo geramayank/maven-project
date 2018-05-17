@@ -1,11 +1,6 @@
 pipeline {
     agent any
-
-    triggers {
-         pollSCM('* * * * *')
-     }
-
-stages{
+    stages{
         stage('Build'){
             steps {
                 sh 'mvn clean package'
@@ -16,8 +11,6 @@ stages{
                     archiveArtifacts artifacts: '**/target/*.war'
                 }
             }
-        }
-
-   
+        }   
     }
 }
