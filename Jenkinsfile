@@ -1,25 +1,41 @@
 pipeline {
     agent any
-    tools {
+
+	tools {
         maven 'localMaven'
     }
+
     triggers {
          pollSCM('* * * * *')
      }
-    stages{
+
+	stages{
         stage('Build'){
             steps {
-            	 echo 'Hello, Java'
-            	sh 'java -version'
-            	 echo 'Hello, Maven'
-                sh 'mvn --version'
-                sh 'mvn clean package'
+                sh 'mvn clean package checkstyle:checkstyle'
             }
             post {
                 success {
-                    echo 'Now Archiving...'                   
+                    echo 'Now Archiving...'
+                    archiveArtifacts artifacts: '**/target/*.war'
                 }
             }
-        }   
+        }
+
+        stage ('Deployments'){
+            parallel{
+                stage ('Deploy to Staging'){
+                    steps {
+                        echo 'Deploy Staging...'
+                    }
+                }
+
+                stage ("Deploy to Production"){
+                    steps {
+                        echo 'Deploy Production...'
+                    }
+                }
+            }
+        }
     }
 }
